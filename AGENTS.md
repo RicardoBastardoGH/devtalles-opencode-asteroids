@@ -22,7 +22,7 @@ High-signal instructions for automated agents working on this repository.
 - **Game states**: Handled by global string `state`: `'playing'`, `'dead'` (2-second respawn delay via `deadTimer`), or `'gameover'`.
 - **Input handling**: `keys` tracks held state; `justPressed` tracks single-frame edge triggers consumed by `pressed(code)`. Default browser scrolling is prevented for arrow keys and spacebar.
 - **Asteroid sizing**: Three tiers indexed 1 (small), 2 (medium), 3 (large) mapped through parallel arrays `RADII = [0, 16, 30, 50]`, `SPEEDS = [0, 85, 55, 32]`, `POINTS = [0, 100, 50, 20]`.
-- **README discrepancy**: `README.md` describes power-ups and shooting stars ("estrella fugaz"), but `game.js` only implements classic Asteroids (ship, bullets, splitting asteroids, particles). Do not assume power-up or shooting star code exists.
+- **Power-ups & Shooting Stars**: The Velocidad (Speed) power-up is implemented in `PowerUp` (15% drop on asteroid destruction, 5s duration, doubles thrust to 520 px/s²). Shooting stars ("estrella fugaz") mentioned in `README.md` are not yet implemented.
 
 ## Common Pitfalls to Avoid
 

@@ -43,3 +43,4 @@ Luego visita `http://localhost:3000`.
 - 3 vidas con invencibilidad temporal al reaparecer (parpadeo)
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
+- Power-up Velocidad: ficha con forma de diamante cian ('V') que duplica el impulso de la nave por 5 segundos al recogerla
