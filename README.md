@@ -24,11 +24,12 @@ Luego visita `http://localhost:3000`.
 
 ## Controles
 
-| Tecla     | Acción     |
-| --------- | ---------- |
-| `←` `→`   | Rotar nave |
-| `↑`       | Propulsar  |
-| `Espacio` | Disparar   |
+| Tecla     | Acción          |
+| --------- | --------------- |
+| `←` `→`   | Rotar nave      |
+| `↑`       | Propulsar       |
+| `Espacio` | Disparar        |
+| `S`       | Cambiar de skin |
 
 ## Puntuación
 
@@ -46,3 +47,8 @@ Luego visita `http://localhost:3000`.
 - Partículas de explosión al destruir asteroides
 - Power-up Velocidad: ficha con forma de diamante cian ('V') que duplica el impulso de la nave por 5 segundos al recogerla
 - Estrella fugaz: asteroide especial veloz con cola luminosa que cruza la pantalla de forma periódica y desaparece con el tiempo (200 puntos)
+- Sistema de skins con persistencia en `localStorage` (tecla `S`):
+  - **Clásica**: Silueta retro blanca con micro-chispas vectoriales al propulsar.
+  - **Interceptor**: Caza afilado en verde neón con halo resplandeciente (`glow`) pulsante continuo.
+  - **Vanguard**: Nave pesada de doble proa en violeta estelar con estela cuántica de siluetas fantasma (`ghosting`).
+  - Los íconos de vidas en el HUD y el indicador de skin activa se adaptan en tiempo real a la apariencia seleccionada.

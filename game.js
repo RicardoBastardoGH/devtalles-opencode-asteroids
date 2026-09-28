@@ -118,9 +118,180 @@ class Asteroid {
   }
 }
 
+// ── Skins ─────────────────────────────────────────────────────────────────────
+const SKIN_STORAGE_KEY = 'asteroids_ship_skin';
+
+const SKINS = [
+  {
+    id: 'classic',
+    name: 'CLÁSICA',
+    color: '#ffffff',
+    thrustColor: 'rgba(255, 130, 0, 0.85)',
+    effect: 'sparks',
+    drawSilhouette(ctx) {
+      ctx.beginPath();
+      ctx.moveTo( 20,   0);   // nariz
+      ctx.lineTo(-12,  -9);   // ala izquierda
+      ctx.lineTo( -7,   0);   // muesca trasera
+      ctx.lineTo(-12,   9);   // ala derecha
+      ctx.closePath();
+      ctx.stroke();
+    },
+    drawLife(ctx) {
+      ctx.beginPath();
+      ctx.moveTo( 9,  0);
+      ctx.lineTo(-6, -5);
+      ctx.lineTo(-3,  0);
+      ctx.lineTo(-6,  5);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  },
+  {
+    id: 'interceptor',
+    name: 'INTERCEPTOR',
+    color: '#00ff88',
+    thrustColor: 'rgba(0, 255, 136, 0.85)',
+    effect: 'glow',
+    drawSilhouette(ctx) {
+      // Caza afilado de alas agresivas y aguja frontal
+      ctx.beginPath();
+      ctx.moveTo( 24,   0);
+      ctx.lineTo(  6,  -5);
+      ctx.lineTo( -4, -14);
+      ctx.lineTo( -2,  -6);
+      ctx.lineTo(-12,  -6);
+      ctx.lineTo( -6,   0);
+      ctx.lineTo(-12,   6);
+      ctx.lineTo( -2,   6);
+      ctx.lineTo( -4,  14);
+      ctx.lineTo(  6,   5);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Nervaduras estilizadas de cabina
+      ctx.beginPath();
+      ctx.moveTo( 14,  0);
+      ctx.lineTo( -2, -4);
+      ctx.moveTo( 14,  0);
+      ctx.lineTo( -2,  4);
+      ctx.stroke();
+    },
+    drawLife(ctx) {
+      ctx.beginPath();
+      ctx.moveTo( 10,  0);
+      ctx.lineTo(  3, -3);
+      ctx.lineTo( -2, -6);
+      ctx.lineTo( -5, -2);
+      ctx.lineTo( -3,  0);
+      ctx.lineTo( -5,  2);
+      ctx.lineTo( -2,  6);
+      ctx.lineTo(  3,  3);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  },
+  {
+    id: 'vanguard',
+    name: 'VANGUARD',
+    color: '#d946ef',
+    thrustColor: 'rgba(217, 70, 239, 0.85)',
+    effect: 'trail',
+    drawSilhouette(ctx) {
+      // Casco pesado doble proa y alerones escalonados
+      ctx.beginPath();
+      ctx.moveTo(  8,   0);
+      ctx.lineTo( 18,  -7);
+      ctx.lineTo(  6,  -8);
+      ctx.lineTo( -8, -13);
+      ctx.lineTo(-12,  -6);
+      ctx.lineTo(-10,   0);
+      ctx.lineTo(-12,   6);
+      ctx.lineTo( -8,  13);
+      ctx.lineTo(  6,   8);
+      ctx.lineTo( 18,   7);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Núcleo cuántico central
+      ctx.beginPath();
+      ctx.arc(0, 0, 3, 0, Math.PI * 2);
+      ctx.stroke();
+    },
+    drawLife(ctx) {
+      ctx.beginPath();
+      ctx.moveTo( 3,  0);
+      ctx.lineTo( 8, -3);
+      ctx.lineTo( 3, -4);
+      ctx.lineTo(-4, -6);
+      ctx.lineTo(-6, -2);
+      ctx.lineTo(-5,  0);
+      ctx.lineTo(-6,  2);
+      ctx.lineTo(-4,  6);
+      ctx.lineTo( 3,  4);
+      ctx.lineTo( 8,  3);
+      ctx.closePath();
+      ctx.stroke();
+    }
+  }
+];
+
+function loadSkinIndex() {
+  try {
+    const saved = localStorage.getItem(SKIN_STORAGE_KEY);
+    const idx = parseInt(saved, 10);
+    if (!isNaN(idx) && idx >= 0 && idx < SKINS.length) {
+      return idx;
+    }
+  } catch (e) {}
+  return 0;
+}
+
+function saveSkinIndex(idx) {
+  try {
+    localStorage.setItem(SKIN_STORAGE_KEY, String(idx));
+  } catch (e) {}
+}
+
+// ── Chispas Retro (Efecto Skin Clásica) ─────────────────────────────────────────
+class Spark {
+  constructor(x, y, vx, vy) {
+    this.x = x;
+    this.y = y;
+    this.vx = vx;
+    this.vy = vy;
+    this.life = rand(0.3, 0.6);
+    this.ttl = this.life;
+    this.dead = false;
+    this.size = rand(1.2, 2.4);
+  }
+
+  update(dt) {
+    this.x = wrap(this.x + this.vx * dt, W);
+    this.y = wrap(this.y + this.vy * dt, H);
+    this.ttl -= dt;
+    if (this.ttl <= 0) this.dead = true;
+  }
+
+  draw() {
+    const alpha = Math.max(0, this.ttl / this.life);
+    ctx.fillStyle = `rgba(255, 255, 255, ${alpha.toFixed(2)})`;
+    ctx.fillRect(this.x - this.size / 2, this.y - this.size / 2, this.size, this.size);
+  }
+}
+
 // ── Ship ──────────────────────────────────────────────────────────────────────
 class Ship {
-  constructor() { this.reset(); }
+  constructor() {
+    this.skinIndex = loadSkinIndex();
+    this.reset();
+  }
+
+  nextSkin() {
+    this.skinIndex = (this.skinIndex + 1) % SKINS.length;
+    this.ghosts = [];
+    saveSkinIndex(this.skinIndex);
+  }
 
   reset() {
     this.x      = W / 2;
@@ -134,6 +305,9 @@ class Ship {
     this.shootCooldown = 0;
     this.speedTimer    = 0;
     this.dead          = false;
+    this.ghosts        = [];
+    this.trailTimer    = 0;
+    this.glowPulse     = 0;
   }
 
   update(dt) {
@@ -141,6 +315,31 @@ class Ship {
     if (this.invincible    > 0) this.invincible    -= dt;
     if (this.shootCooldown > 0) this.shootCooldown -= dt;
     if (this.speedTimer    > 0) this.speedTimer    -= dt;
+
+    const currentSkin = SKINS[this.skinIndex];
+
+    // Actualización de efectos de skin
+    if (currentSkin.effect === 'glow') {
+      this.glowPulse += dt * 5;
+    }
+
+    if (currentSkin.effect === 'trail') {
+      this.trailTimer -= dt;
+      const speed = Math.hypot(this.vx, this.vy);
+      if (this.trailTimer <= 0 && (speed > 10 || this.thrusting)) {
+        this.ghosts.push({
+          x: this.x,
+          y: this.y,
+          angle: this.angle,
+          alpha: 0.55
+        });
+        this.trailTimer = 0.045;
+      }
+    }
+    for (const g of this.ghosts) {
+      g.alpha -= dt * 1.8;
+    }
+    this.ghosts = this.ghosts.filter(g => g.alpha > 0);
 
     const ROT   = 3.5;   // rad/s
     const THRUST = this.speedTimer > 0 ? 520 : 260;  // px/s² (2x with speed boost)
@@ -153,6 +352,18 @@ class Ship {
     if (this.thrusting) {
       this.vx += Math.cos(this.angle) * THRUST * dt;
       this.vy += Math.sin(this.angle) * THRUST * dt;
+
+      // Efecto chispas retro al propulsar (skin Clásica)
+      if (currentSkin.effect === 'sparks' && Math.random() < 0.6) {
+        const rearAngle = this.angle + Math.PI + rand(-0.4, 0.4);
+        const sparkSpeed = rand(40, 100);
+        sparks.push(new Spark(
+          this.x - Math.cos(this.angle) * 10,
+          this.y - Math.sin(this.angle) * 10,
+          Math.cos(rearAngle) * sparkSpeed,
+          Math.sin(rearAngle) * sparkSpeed
+        ));
+      }
     }
 
     this.vx *= DRAG;
@@ -172,24 +383,44 @@ class Ship {
 
   draw() {
     if (this.dead) return;
+    const currentSkin = SKINS[this.skinIndex];
+
+    // Estela cuántica (Vanguard) se dibuja en coordenadas globales antes de la nave
+    if (currentSkin.effect === 'trail' && this.ghosts.length > 0) {
+      for (const g of this.ghosts) {
+        ctx.save();
+        ctx.translate(g.x, g.y);
+        ctx.rotate(g.angle);
+        ctx.strokeStyle = `rgba(217, 70, 239, ${(g.alpha * 0.4).toFixed(3)})`;
+        ctx.lineWidth   = 1.2;
+        ctx.lineJoin    = 'round';
+        currentSkin.drawSilhouette(ctx);
+        ctx.restore();
+      }
+    }
+
     // Parpadeo durante invencibilidad de reaparición
     if (this.invincible > 0 && Math.floor(this.invincible * 8) % 2 === 0) return;
 
     ctx.save();
     ctx.translate(this.x, this.y);
     ctx.rotate(this.angle);
-    ctx.strokeStyle = this.speedTimer > 0 ? '#00e5ff' : '#fff';
+
+    const baseColor = this.speedTimer > 0 ? '#00e5ff' : currentSkin.color;
+    const flameColor = this.speedTimer > 0 ? 'rgba(0, 229, 255, 0.9)' : currentSkin.thrustColor;
+
+    // Resplandor neón pulsante (Interceptor)
+    if (currentSkin.effect === 'glow') {
+      const pulse = 6 + Math.sin(this.glowPulse) * 4;
+      ctx.shadowColor = baseColor;
+      ctx.shadowBlur = pulse;
+    }
+
+    ctx.strokeStyle = baseColor;
     ctx.lineWidth   = 1.5;
     ctx.lineJoin    = 'round';
 
-    // Silueta clásica: triángulo con muesca trasera
-    ctx.beginPath();
-    ctx.moveTo( 20,  0);   // nariz
-    ctx.lineTo(-12, -9);   // ala izquierda
-    ctx.lineTo( -7,  0);   // muesca trasera
-    ctx.lineTo(-12,  9);   // ala derecha
-    ctx.closePath();
-    ctx.stroke();
+    currentSkin.drawSilhouette(ctx);
 
     // Llama del propulsor
     if (this.thrusting && Math.random() > 0.35) {
@@ -197,7 +428,7 @@ class Ship {
       ctx.moveTo(-8, -4);
       ctx.lineTo(-8 - rand(this.speedTimer > 0 ? 10 : 6, this.speedTimer > 0 ? 22 : 14), 0);
       ctx.lineTo(-8,  4);
-      ctx.strokeStyle = this.speedTimer > 0 ? 'rgba(0, 229, 255, 0.9)' : 'rgba(255, 130, 0, 0.85)';
+      ctx.strokeStyle = flameColor;
       ctx.stroke();
     }
 
@@ -371,7 +602,7 @@ class ShootingStar {
 }
 
 // ── Estado del juego ──────────────────────────────────────────────────────────
-let ship, bullets, asteroids, particles, powerups, shootingStars;
+let ship, bullets, asteroids, particles, powerups, shootingStars, sparks;
 let score, lives, level;
 let state;      // 'playing' | 'dead' | 'gameover'
 let deadTimer, shootingStarTimer;
@@ -421,6 +652,7 @@ function initGame() {
   bullets       = [];
   asteroids     = [];
   particles     = [];
+  sparks        = [];
   powerups      = [];
   shootingStars = [];
   shootingStarTimer = rand(8, 12);
@@ -435,6 +667,7 @@ function nextLevel() {
   level++;
   bullets   = [];
   particles = [];
+  sparks    = [];
   const currentSpeed = ship.speedTimer;
   ship.reset();
   ship.speedTimer = currentSpeed;
@@ -449,6 +682,7 @@ function killShip() {
   explode(ship.x, ship.y, 14);
   ship.dead = true;
   ship.speedTimer = 0;
+  ship.ghosts = [];
   lives--;
   if (lives <= 0) {
     state = 'gameover';
@@ -460,10 +694,17 @@ function killShip() {
 
 // ── Update ────────────────────────────────────────────────────────────────────
 function update(dt) {
+  // Cambio de skin global en cualquier estado
+  if (pressed('KeyS') && ship) {
+    ship.nextSkin();
+  }
+
   if (state === 'gameover') {
     if (pressed('Space')) initGame();
     particles.forEach(p => p.update(dt));
     particles = particles.filter(p => !p.dead);
+    sparks.forEach(s => s.update(dt));
+    sparks = sparks.filter(s => !s.dead);
     return;
   }
 
@@ -471,6 +712,8 @@ function update(dt) {
     deadTimer -= dt;
     particles.forEach(p => p.update(dt));
     particles = particles.filter(p => !p.dead);
+    sparks.forEach(s => s.update(dt));
+    sparks = sparks.filter(s => !s.dead);
     asteroids.forEach(a => a.update(dt));
     powerups.forEach(p => p.update(dt));
     powerups = powerups.filter(p => !p.dead);
@@ -498,11 +741,13 @@ function update(dt) {
   bullets.forEach(b => b.update(dt));
   asteroids.forEach(a => a.update(dt));
   particles.forEach(p => p.update(dt));
+  sparks.forEach(s => s.update(dt));
   powerups.forEach(p => p.update(dt));
   shootingStars.forEach(s => s.update(dt));
 
   bullets       = bullets.filter(b => !b.dead);
   particles     = particles.filter(p => !p.dead);
+  sparks        = sparks.filter(p => !p.dead);
   powerups      = powerups.filter(p => !p.dead);
   shootingStars = shootingStars.filter(s => !s.dead);
 
@@ -579,19 +824,14 @@ function update(dt) {
 
 // ── Draw ──────────────────────────────────────────────────────────────────────
 function drawLifeIcon(x, y) {
+  const currentSkin = SKINS[ship ? ship.skinIndex : loadSkinIndex()];
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(-Math.PI / 2);
-  ctx.strokeStyle = '#fff';
+  ctx.strokeStyle = currentSkin.color;
   ctx.lineWidth   = 1.2;
   ctx.lineJoin    = 'round';
-  ctx.beginPath();
-  ctx.moveTo( 9,  0);
-  ctx.lineTo(-6, -5);
-  ctx.lineTo(-3,  0);
-  ctx.lineTo(-6,  5);
-  ctx.closePath();
-  ctx.stroke();
+  currentSkin.drawLife(ctx);
   ctx.restore();
 }
 
@@ -613,6 +853,15 @@ function drawHUD() {
     ctx.textAlign = 'left';
     ctx.fillText(`VEL 2X  ${ship.speedTimer.toFixed(1)}s`, 14, 48);
   }
+
+  // Indicador de Skin activa
+  const currentSkin = SKINS[ship ? ship.skinIndex : loadSkinIndex()];
+  ctx.font = '13px monospace';
+  ctx.textAlign = 'left';
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.fillText('SKIN [S]: ', 14, H - 16);
+  ctx.fillStyle = currentSkin.color;
+  ctx.fillText(currentSkin.name, 90, H - 16);
 }
 
 function drawOverlay(title, sub) {
@@ -629,6 +878,7 @@ function draw() {
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, W, H);
 
+  sparks.forEach(s => s.draw());
   particles.forEach(p => p.draw());
   powerups.forEach(p => p.draw());
   shootingStars.forEach(s => s.draw());

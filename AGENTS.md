@@ -23,6 +23,7 @@ High-signal instructions for automated agents working on this repository.
 - **Input handling**: `keys` tracks held state; `justPressed` tracks single-frame edge triggers consumed by `pressed(code)`. Default browser scrolling is prevented for arrow keys and spacebar.
 - **Asteroid sizing**: Three tiers indexed 1 (small), 2 (medium), 3 (large) mapped through parallel arrays `RADII = [0, 16, 30, 50]`, `SPEEDS = [0, 85, 55, 32]`, `POINTS = [0, 100, 50, 20]`.
 - **Power-ups & Shooting Stars**: The Velocidad (Speed) power-up is implemented in `PowerUp` (15% drop on asteroid destruction, 5s duration, doubles thrust to 520 px/s²). Shooting stars ("estrella fugaz") are implemented in `ShootingStar` (periodic independent spawn every 12–16s, 260 px/s speed, 4.5s TTL, 200 points, does not split).
+- **Skins System**: Three selectable ship skins defined in `SKINS` array (Clásica with sparks, Interceptor with pulsing neon glow, Vanguard with ghosting trail). Toggled via `S` key (`KeyS`), persisted in `localStorage` via key `'asteroids_ship_skin'`; life icons and HUD display reflect selected skin.
 
 ## Common Pitfalls to Avoid
 
