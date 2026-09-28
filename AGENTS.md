@@ -22,7 +22,7 @@ High-signal instructions for automated agents working on this repository.
 - **Game states**: Handled by global string `state`: `'playing'`, `'dead'` (2-second respawn delay via `deadTimer`), or `'gameover'`.
 - **Input handling**: `keys` tracks held state; `justPressed` tracks single-frame edge triggers consumed by `pressed(code)`. Default browser scrolling is prevented for arrow keys and spacebar.
 - **Asteroid sizing**: Three tiers indexed 1 (small), 2 (medium), 3 (large) mapped through parallel arrays `RADII = [0, 16, 30, 50]`, `SPEEDS = [0, 85, 55, 32]`, `POINTS = [0, 100, 50, 20]`.
-- **Power-ups & Shooting Stars**: The Velocidad (Speed) power-up is implemented in `PowerUp` (15% drop on asteroid destruction, 5s duration, doubles thrust to 520 px/s²). Shooting stars ("estrella fugaz") are implemented in `ShootingStar` (periodic independent spawn every 12–16s, 260 px/s speed, 4.5s TTL, 200 points, does not split).
+- **Power-ups & Shooting Stars**: Power-ups are implemented in `PowerUp` (15% drop on asteroid destruction: 50% chance for Velocidad ('speed', 5s duration, doubles thrust to 520 px/s²), 50% chance for Escudo ('shield', 8s duration via `shieldTimer`, destroys colliding asteroids/shooting stars on contact without depleting early, blinks when expiring under 2s)). Shooting stars ("estrella fugaz") are implemented in `ShootingStar` (periodic independent spawn every 12–16s, 260 px/s speed, 4.5s TTL, 200 points, does not split).
 
 ## Common Pitfalls to Avoid
 

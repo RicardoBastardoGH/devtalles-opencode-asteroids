@@ -45,4 +45,5 @@ Luego visita `http://localhost:3000`.
 - Asteroides se parten en fragmentos más pequeños al ser destruidos
 - Partículas de explosión al destruir asteroides
 - Power-up Velocidad: ficha con forma de diamante cian ('V') que duplica el impulso de la nave por 5 segundos al recogerla
+- Power-up Escudo: ficha con forma de hexágono verde ('S') que otorga un campo de fuerza por 8 segundos; durante este tiempo destruye los asteroides y estrellas fugaces al impactarlos sin que el escudo se consuma prematuramente
 - Estrella fugaz: asteroide especial veloz con cola luminosa que cruza la pantalla de forma periódica y desaparece con el tiempo (200 puntos)
